@@ -85,6 +85,12 @@
     </p>
     <table>
       <tr>
+        <th>Font file: &nbsp;</th>
+        <td>
+          <input type="file" id="fontFile" accept=".ttf,.otf">
+        </td>
+      </tr>
+      <tr>
         <th>Font name: &nbsp;</th>
         <td>
           <input type="text" id="fontName" value="Arial" autofocus>
@@ -217,6 +223,7 @@
     <script>
 
 (function() {
+  var inputFontFile = document.getElementById('fontFile');
   var buttonDownload = document.getElementById('download');
   var buttonGenerate = document.getElementById('generate');
   var canvas = document.createElement('canvas');
@@ -1121,6 +1128,30 @@
   }
 
   buttonGenerate.onclick = generate;
+
+  inputFontFile.onchange = async function(e) {
+    const file = e.target.files[0];
+    if (!file)
+      return;
+  
+    const fontName = file.name.replace(/\.[^.]+$/, '');
+  
+    const buffer = await file.arrayBuffer();
+
+    const font = new FontFace(
+      fontName,
+      buffer
+    );
+  
+    await font.load();
+  
+    document.fonts.add(font);
+  
+    textboxFontName.value = fontName;
+  
+    checkFontName();
+    generate();
+  };
 
   checkboxCharactersASCII.onchange = updateCharacters;
   checkboxCharactersCustom.onchange = updateCharacters;
